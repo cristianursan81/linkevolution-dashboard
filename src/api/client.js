@@ -13,22 +13,14 @@ async function request(path, options = {}) {
   }
 
   const url = `${BASE_URL}${path}`
-  console.log(`[api] ${options.method || 'GET'} ${url}`)
-  if (options.body) console.log('[api] body:', options.body)
 
   let res
   try {
     res = await fetch(url, { ...options, headers })
   } catch (networkErr) {
-    console.error('[api] Network error (fetch threw):', networkErr)
+    console.error('[api] Network error:', networkErr)
     throw networkErr
   }
-
-  console.log(`[api] response: ${res.status} ${res.statusText}`)
-  console.log('[api] CORS headers:', {
-    'access-control-allow-origin': res.headers.get('access-control-allow-origin'),
-    'access-control-allow-credentials': res.headers.get('access-control-allow-credentials'),
-  })
 
   if (res.status === 401) {
     localStorage.removeItem('le_token')
@@ -37,7 +29,6 @@ async function request(path, options = {}) {
   }
 
   const text = await res.text()
-  console.log('[api] raw response body:', text)
 
   if (!res.ok) {
     throw new Error(text || `HTTP ${res.status}`)
@@ -46,7 +37,7 @@ async function request(path, options = {}) {
   try {
     return text ? JSON.parse(text) : null
   } catch (parseErr) {
-    console.error('[api] JSON parse error:', parseErr, 'body was:', text)
+    console.error('[api] JSON parse error:', parseErr)
     throw new Error(`Invalid JSON response: ${text}`)
   }
 }
