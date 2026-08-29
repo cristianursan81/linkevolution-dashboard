@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { BarChart2, Inbox, LogOut, MessageSquare, Users } from 'lucide-react'
+import { BarChart2, Inbox, LogOut, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import logo from '../assets/logo.png'
 
 const NAV = [
   { to: '/inbox', icon: Inbox, label: 'Inbox' },
@@ -20,9 +21,7 @@ export default function Sidebar() {
   return (
     <aside className="flex w-16 shrink-0 flex-col border-r border-gray-800 bg-gray-900 lg:w-56">
       <div className="flex h-14 items-center gap-2.5 border-b border-gray-800 px-4">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-teal-600 to-cyan-600">
-          <MessageSquare className="h-4 w-4 text-white" />
-        </div>
+        <img src={logo} alt="Linkevolution" className="h-7 w-7 shrink-0 object-contain" />
         <span className="hidden truncate text-sm font-semibold text-white lg:block">Linkevolution</span>
       </div>
 

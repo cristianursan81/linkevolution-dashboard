@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import logo from '../assets/logo.png'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -28,10 +29,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-950 p-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-600 to-cyan-600">
-            <MessageSquare className="h-5 w-5 text-white" />
-          </div>
+        <div className="mb-8 flex items-center justify-center gap-2.5">
+          <img src={logo} alt="Linkevolution" className="h-10 w-10 object-contain" />
           <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-xl font-semibold text-transparent">
             Linkevolution
           </span>
