@@ -2,7 +2,7 @@
 
 Inbox de agentes para [Linkevolution](https://linkevolution.eu): WhatsApp, webchat, email y CRM.
 
-SPA en React 19 + Vite 8. Habla con el API gateway (`VITE_API_URL`, por defecto Railway). Deploy previsto en Vercel (`vercel.json` reescribe todas las rutas a `index.html`).
+SPA en React 19 + Vite 8. Habla con el API gateway (`VITE_API_URL`, por defecto Railway). Deploy en Vercel (`vercel.json` reescribe todas las rutas a `index.html`).
 
 ## Desarrollo
 
@@ -12,9 +12,41 @@ npm install
 npm run dev
 ```
 
-El CORS del gateway solo permite orígenes concretos (`localhost:5173`, `localhost:3000` y `https://linkevolution-dashboard-gbq2.vercel.app`). Si despliegas otra URL, hay que añadirla en `gateway/main.py` del repo privado `linkevolution`.
-
 No subas `.env` al git. Usa `.env.example` como plantilla.
+
+## Vercel (producción)
+
+Usa **un** proyecto: [linkevolution-dashboard-gbq2](https://vercel.com/cristian-ursans-projects/linkevolution-dashboard-gbq2). Los otros dos proyectos del mismo repo se pueden ignorar o desconectar.
+
+1. **Settings → Git** → Production Branch = `master`.
+2. **Settings → Environment Variables** (Production + Preview):
+   - `VITE_API_URL` = `https://linkevolution-production.up.railway.app`
+3. **Deployments** → el último *Ready* de `master` → **Promote to Production**.
+   (Hoy [linkevolution-dashboard-gbq2.vercel.app](https://linkevolution-dashboard-gbq2.vercel.app) sigue sirviendo el build de abril.)
+4. **Settings → Deployment Protection** → desactivar Vercel Authentication en Production si los agentes deben entrar sin login de Vercel.
+5. **Settings → Domains** → Add `dashboard.linkevolution.eu`.
+
+## DNS para el dashboard
+
+En Namecheap, Advanced DNS (el sitio `@` va a GitHub Pages; esto es solo el inbox):
+
+| Type | Host | Value |
+|---|---|---|
+| CNAME | `dashboard` | `cname.vercel-dns.com.` |
+
+No cambies `app` (`app.linkevolution.eu` ya apunta a Railway).
+
+## CORS
+
+El gateway solo permite orígenes concretos (`localhost:5173`, `localhost:3000` y `https://linkevolution-dashboard-gbq2.vercel.app`).
+
+Cuando el custom domain esté vivo, añade en `gateway/main.py` del repo privado `linkevolution`:
+
+```
+https://dashboard.linkevolution.eu
+```
+
+Sin eso el login falla en el navegador aunque Vercel esté bien.
 
 ## Contrato del API
 
