@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-import { MessageSquare, Inbox, Users, BarChart2, LogOut } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { BarChart2, Inbox, LogOut, MessageSquare, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
@@ -10,56 +10,57 @@ const NAV = [
 
 export default function Sidebar() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
-    <aside className="w-16 lg:w-56 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0">
-      {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-gray-800 gap-2.5">
-        <div className="w-7 h-7 bg-violet-600 rounded-md flex items-center justify-center shrink-0">
-          <MessageSquare className="w-4 h-4 text-white" />
+    <aside className="flex w-16 shrink-0 flex-col border-r border-gray-800 bg-gray-900 lg:w-56">
+      <div className="flex h-14 items-center gap-2.5 border-b border-gray-800 px-4">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-teal-600 to-cyan-600">
+          <MessageSquare className="h-4 w-4 text-white" />
         </div>
-        <span className="hidden lg:block text-white font-semibold text-sm truncate">
-          Linkevolution
-        </span>
+        <span className="hidden truncate text-sm font-semibold text-white lg:block">Linkevolution</span>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 py-4 px-2 space-y-1">
+      <nav className="flex-1 space-y-1 px-2 py-4">
         {NAV.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-violet-600/20 text-violet-300'
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'
+                  ? 'bg-teal-600/20 text-teal-300'
+                  : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
               }`
             }
           >
-            <Icon className="w-4 h-4 shrink-0" />
+            <Icon className="h-4 w-4 shrink-0" />
             <span className="hidden lg:block">{label}</span>
           </NavLink>
         ))}
       </nav>
 
-      {/* User + logout */}
       <div className="border-t border-gray-800 p-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-violet-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-700 text-xs font-bold text-white">
             {(user?.email?.[0] || user?.name?.[0] || 'U').toUpperCase()}
           </div>
-          <div className="hidden lg:block flex-1 min-w-0">
-            <p className="text-gray-200 text-xs font-medium truncate">
-              {user?.name || user?.email || 'Usuario'}
-            </p>
+          <div className="hidden min-w-0 flex-1 lg:block">
+            <p className="truncate text-xs font-medium text-gray-200">{user?.email || user?.name || 'Usuario'}</p>
+            {user?.role && <p className="truncate text-[10px] text-gray-500">{user.role}</p>}
           </div>
           <button
-            onClick={logout}
+            type="button"
+            onClick={handleLogout}
             title="Cerrar sesión"
-            className="ml-auto text-gray-500 hover:text-red-400 transition-colors"
+            className="ml-auto text-gray-500 transition-colors hover:text-red-400"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>

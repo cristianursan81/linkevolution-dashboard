@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Loader2, MessageSquare } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { MessageSquare, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/inbox')
+      navigate('/inbox', { replace: true })
     } catch (err) {
       setError(err.message || 'Credenciales incorrectas')
     } finally {
@@ -26,50 +26,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-950 p-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-9 h-9 bg-violet-600 rounded-lg flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-white" />
+        <div className="mb-8 flex items-center justify-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-600 to-cyan-600">
+            <MessageSquare className="h-5 w-5 text-white" />
           </div>
-          <span className="text-white text-xl font-semibold">Linkevolution</span>
+          <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-xl font-semibold text-transparent">
+            Linkevolution
+          </span>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8">
-          <h1 className="text-white text-xl font-semibold mb-1">Iniciar sesión</h1>
-          <p className="text-gray-400 text-sm mb-6">Accede a tu dashboard de conversaciones</p>
+        <div className="rounded-xl border border-gray-800 bg-gray-900 p-8">
+          <h1 className="mb-1 text-xl font-semibold text-white">Iniciar sesión</h1>
+          <p className="mb-6 text-sm text-gray-400">Accede al inbox de conversaciones</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-1.5">
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-300">
                 Email
               </label>
               <input
+                id="email"
                 type="email"
+                autoComplete="username"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="tu@empresa.com"
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3.5 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-1.5">
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-300">
                 Contraseña
               </label>
               <input
+                id="password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3.5 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none"
               />
             </div>
 
             {error && (
-              <div className="bg-red-950 border border-red-800 text-red-300 text-sm rounded-lg px-3.5 py-2.5">
+              <div className="rounded-lg border border-red-800 bg-red-950 px-3.5 py-2.5 text-sm text-red-300">
                 {error}
               </div>
             )}
@@ -77,9 +82,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 text-sm transition-colors flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-cyan-600 py-2.5 text-sm font-medium text-white transition-colors hover:from-teal-500 hover:to-cyan-500 disabled:opacity-60"
             >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>

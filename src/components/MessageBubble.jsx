@@ -1,69 +1,61 @@
-import { Bot, User, Headphones } from 'lucide-react'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { Bot, Headphones, User } from 'lucide-react'
+import { clockTime, isAi, isInbound, messageText } from '../lib/format'
 
-function SenderIcon({ sender, isAi }) {
-  if (sender === 'contact') return <User className="w-3.5 h-3.5" />
-  if (isAi) return <Bot className="w-3.5 h-3.5" />
-  return <Headphones className="w-3.5 h-3.5" />
-}
-
-function AiLabel({ isAi, sender }) {
-  if (sender === 'contact') return null
-  return (
-    <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full font-medium ${
-      isAi
-        ? 'bg-violet-900/60 text-violet-300'
-        : 'bg-sky-900/60 text-sky-300'
-    }`}>
-      {isAi ? <Bot className="w-2.5 h-2.5" /> : <Headphones className="w-2.5 h-2.5" />}
-      {isAi ? 'IA' : 'Agente'}
-    </span>
-  )
+function SenderIcon({ ai }) {
+  if (ai) return <Bot className="h-3.5 w-3.5" />
+  return <Headphones className="h-3.5 w-3.5" />
 }
 
 export default function MessageBubble({ message }) {
-  const isContact = message.sender_type === 'contact' || message.direction === 'inbound'
-  const isAi = message.ai_generated === true || message.sender_type === 'ai' || message.generated_by === 'ai'
-  const isAgent = !isContact && !isAi
+  const inbound = isInbound(message)
+  const ai = isAi(message)
+  const timeStr = clockTime(message.created_at || message.timestamp)
+  const text = messageText(message)
+  const pending = Boolean(message.pending)
 
-  const ts = message.created_at || message.timestamp
-  const timeStr = ts
-    ? format(new Date(ts), 'HH:mm', { locale: es })
-    : ''
-
-  if (isContact) {
+  if (inbound) {
     return (
-      <div className="flex items-end gap-2 max-w-[80%]">
-        <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center shrink-0 mb-1">
-          <User className="w-3.5 h-3.5 text-gray-300" />
+      <div className="flex max-w-[80%] items-end gap-2">
+        <div className="mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-700">
+          <User className="h-3.5 w-3.5 text-gray-300" />
         </div>
         <div>
-          <div className="bg-gray-800 border border-gray-700 text-gray-100 rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
-            {message.content}
+          <div className="rounded-2xl rounded-bl-sm border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm whitespace-pre-wrap text-gray-100">
+            {text || <span className="text-gray-500 italic">Mensaje vacío</span>}
           </div>
-          <div className="text-gray-500 text-xs mt-1 pl-1">{timeStr}</div>
+          <div className="mt-1 pl-1 text-xs text-gray-500">{timeStr}</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex items-end gap-2 max-w-[80%] ml-auto flex-row-reverse">
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-1 ${
-        isAi ? 'bg-violet-700' : 'bg-sky-700'
-      }`}>
-        <SenderIcon sender="agent" isAi={isAi} />
+    <div className={`ml-auto flex max-w-[80%] flex-row-reverse items-end gap-2 ${pending ? 'opacity-60' : ''}`}>
+      <div
+        className={`mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+          ai ? 'bg-teal-700' : 'bg-sky-700'
+        }`}
+      >
+        <SenderIcon ai={ai} />
       </div>
       <div>
-        <div className={`text-white rounded-2xl rounded-br-sm px-4 py-2.5 text-sm ${
-          isAi ? 'bg-violet-700' : 'bg-sky-700'
-        }`}>
-          {message.content}
+        <div
+          className={`rounded-2xl rounded-br-sm px-4 py-2.5 text-sm whitespace-pre-wrap text-white ${
+            ai ? 'bg-teal-700' : 'bg-sky-700'
+          }`}
+        >
+          {text || <span className="italic opacity-70">Mensaje vacío</span>}
         </div>
-        <div className="flex items-center gap-2 mt-1 pr-1 justify-end">
-          <AiLabel isAi={isAi} sender="agent" />
-          <span className="text-gray-500 text-xs">{timeStr}</span>
+        <div className="mt-1 flex items-center justify-end gap-2 pr-1">
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium ${
+              ai ? 'bg-teal-900/60 text-teal-300' : 'bg-sky-900/60 text-sky-300'
+            }`}
+          >
+            {ai ? <Bot className="h-2.5 w-2.5" /> : <Headphones className="h-2.5 w-2.5" />}
+            {ai ? 'IA' : 'Agente'}
+          </span>
+          <span className="text-xs text-gray-500">{pending ? 'Enviando…' : timeStr}</span>
         </div>
       </div>
     </div>
