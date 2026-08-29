@@ -2,6 +2,8 @@
 
 Inbox de agentes para [Linkevolution](https://linkevolution.eu): WhatsApp, webchat, email y CRM.
 
+**Producción:** [https://dashboard.linkevolution.eu](https://dashboard.linkevolution.eu)
+
 SPA en React 19 + Vite 8. Habla con el API gateway (`VITE_API_URL`, por defecto Railway). Deploy en Vercel (`vercel.json` reescribe todas las rutas a `index.html`).
 
 ## Desarrollo
@@ -16,17 +18,16 @@ No subas `.env` al git. Usa `.env.example` como plantilla.
 
 ## Vercel (producción)
 
-Usa **un** proyecto: [linkevolution-dashboard-gbq2](https://vercel.com/cristian-ursans-projects/linkevolution-dashboard-gbq2). Los otros dos proyectos del mismo repo se pueden ignorar o desconectar.
+Proyecto: [linkevolution-dashboard-gbq2](https://vercel.com/cristian-ursans-projects/linkevolution-dashboard-gbq2). Los otros dos proyectos del mismo repo se pueden ignorar o desconectar.
 
-1. **Settings → Git** → Production Branch = `master`.
-2. **Settings → Environment Variables** (Production + Preview):
-   - `VITE_API_URL` = `https://linkevolution-production.up.railway.app`
-3. **Deployments** → el último *Ready* de `master` → **Promote to Production**.
-   (Hoy [linkevolution-dashboard-gbq2.vercel.app](https://linkevolution-dashboard-gbq2.vercel.app) sigue sirviendo el build de abril.)
-4. **Settings → Deployment Protection** → desactivar Vercel Authentication en Production si los agentes deben entrar sin login de Vercel.
-5. **Settings → Domains** → Add `dashboard.linkevolution.eu`.
+- Production Branch = `master`
+- `VITE_API_URL` = `https://linkevolution-production.up.railway.app` (Production + Preview)
+- Dominio: `dashboard.linkevolution.eu` → CNAME `cname.vercel-dns.com.`
+- Deployment Protection: Vercel Authentication **off** en Production
 
-## DNS para el dashboard
+Tras un push a `master`, si el custom domain sigue en un build viejo: **Deployments → Promote to Production**.
+
+## DNS
 
 En Namecheap, Advanced DNS (el sitio `@` va a GitHub Pages; esto es solo el inbox):
 
@@ -38,15 +39,12 @@ No cambies `app` (`app.linkevolution.eu` ya apunta a Railway).
 
 ## CORS
 
-El gateway solo permite orígenes concretos (`localhost:5173`, `localhost:3000` y `https://linkevolution-dashboard-gbq2.vercel.app`).
+El gateway (repo privado `linkevolution`) permite:
 
-Cuando el custom domain esté vivo, añade en `gateway/main.py` del repo privado `linkevolution`:
-
-```
-https://dashboard.linkevolution.eu
-```
-
-Sin eso el login falla en el navegador aunque Vercel esté bien.
+- `http://localhost:5173`
+- `http://localhost:3000`
+- `https://linkevolution-dashboard-gbq2.vercel.app`
+- `https://dashboard.linkevolution.eu`
 
 ## Contrato del API
 
