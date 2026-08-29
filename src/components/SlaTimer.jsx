@@ -11,32 +11,54 @@ function parseDuration(ms) {
   return `${s}s`
 }
 
-export default function SlaTimer({ slaDeadline, status }) {
-  const [now, setNow] = useState(Date.now())
+export default function SlaTimer({ slaBreached, slaDeadline, status }) {
+  const closed = status === 'resolved' || status === 'closed'
+  const [tick, setTick] = useState({ breached: false, urgent: false, label: '' })
 
   useEffect(() => {
-    if (status === 'resolved' || status === 'closed') return
-    const id = setInterval(() => setNow(Date.now()), 1000)
+    if (closed || slaBreached || !slaDeadline) return undefined
+
+    function update() {
+      const deadline = new Date(slaDeadline).getTime()
+      if (Number.isNaN(deadline)) {
+        setTick({ breached: false, urgent: false, label: '' })
+        return
+      }
+      const diff = deadline - Date.now()
+      const breached = diff < 0
+      setTick({
+        breached,
+        urgent: !breached && diff < 5 * 60 * 1000,
+        label: breached ? `+${parseDuration(diff)} SLA` : parseDuration(diff),
+      })
+    }
+
+    update()
+    const id = setInterval(update, 1000)
     return () => clearInterval(id)
-  }, [status])
+  }, [closed, slaBreached, slaDeadline])
 
-  if (!slaDeadline) return null
+  if (closed) return null
 
-  const deadline = new Date(slaDeadline).getTime()
-  const diff = deadline - now
-  const breached = diff < 0
-  const urgent = !breached && diff < 5 * 60 * 1000 // < 5 min
-
-  if (status === 'resolved' || status === 'closed') {
-    return <span className="text-xs text-gray-500">Cerrado</span>
+  if (slaBreached) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-red-400">
+        <Clock className="h-3 w-3" />
+        SLA incumplido
+      </span>
+    )
   }
 
+  if (!slaDeadline || !tick.label) return null
+
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium ${
-      breached ? 'text-red-400' : urgent ? 'text-yellow-400' : 'text-gray-400'
-    }`}>
-      <Clock className="w-3 h-3" />
-      {breached ? `+${parseDuration(diff)} SLA` : parseDuration(diff)}
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-medium ${
+        tick.breached ? 'text-red-400' : tick.urgent ? 'text-yellow-400' : 'text-gray-400'
+      }`}
+    >
+      <Clock className="h-3 w-3" />
+      {tick.label}
     </span>
   )
 }

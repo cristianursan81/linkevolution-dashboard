@@ -1,16 +1,40 @@
-# React + Vite
+# Linkevolution Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Inbox de agentes para [Linkevolution](https://linkevolution.eu): WhatsApp, webchat, email y CRM.
 
-Currently, two official plugins are available:
+SPA en React 19 + Vite 8. Habla con el API gateway (`VITE_API_URL`, por defecto Railway). Deploy previsto en Vercel (`vercel.json` reescribe todas las rutas a `index.html`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Desarrollo
 
-## React Compiler
+```bash
+cp .env.example .env
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+El CORS del gateway solo permite orígenes concretos (`localhost:5173`, `localhost:3000` y `https://linkevolution-dashboard-gbq2.vercel.app`). Si despliegas otra URL, hay que añadirla en `gateway/main.py` del repo privado `linkevolution`.
 
-## Expanding the ESLint configuration
+No subas `.env` al git. Usa `.env.example` como plantilla.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Contrato del API
+
+El dashboard está alineado con el gateway real (no con un CRM genérico):
+
+| Recurso | Contrato |
+|---|---|
+| Login | `POST /auth/login` → `access_token`, `role`, `tenant_id`, `user_id` |
+| Conversación | `contact_id`, `channel`, `status`, `ai_active`, `message_count`, `last_message_at`, `sla_breached` (sin contacto anidado ni último mensaje) |
+| Mensaje | `body`, `direction`, `sender_type`, `created_at` |
+| Enviar | `POST /conversations/{id}/messages` con `{ body }` |
+| Resolver | `POST /conversations/{id}/resolve` |
+| Contacto | `display_name`, `phone`, `email`, `lead_score`, `language`, `is_blocked` |
+| Analytics | `GET /analytics/summary` → totales, abiertas, resueltas, contactos, mensajes hoy, IA |
+
+El inbox une contactos en el cliente para mostrar el nombre. En escritorio la lista y el hilo van en split view (`/inbox` y `/inbox/:id`).
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```

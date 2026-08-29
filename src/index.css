@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #030712;
+  color: #e5e7eb;
+}
+
+button,
+[role="button"],
+a {
+  cursor: pointer;
+}
+
+textarea {
+  field-sizing: content;
+}
